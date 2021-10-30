@@ -118,16 +118,96 @@ if ($response->getStatusCode() == 200){
 
     $insertStment = $insertStment.implode(",",$aux);
     $pdo->exec($insertStment);
+    
+}
+
+// Send a request to https://foo.com/api/test
+$response = $client->request('GET', 'starships');
+
+if ($response->getStatusCode() == 200){
+
+    $body = $response->getBody();
+    $body = (string)$body;
+    $bodyArr = json_decode($body, true);
+    $ended = false;
+
+    $insertStment = "INSERT INTO teachaway2.starship
+    (name, model, manufacturer, cost_in_credits, `length`, max_atmosphering_speed, crew, passengers, cargo_capacity, consumables, hyperdrive_rating, mglt, starship_class, pilots, films, created, edited, url, count)
+    VALUES ";
+
+    $aux = [];
+    $page = 1;
+
+    while (!$ended){
+
+        $next = $bodyArr["next"];
+        if (is_null($next)){
+            $ended = true;
+            continue;
+        }
+
+        foreach($bodyArr["results"] as $vehicle){
+
+            // getting the last registered user
+            $stmt = $pdo->query("select CONVERT_TZ('".$vehicle["created"]."', '+00:00','+00:00') as created;");
+            $created = $stmt->fetch()["created"];
+
+            $stmt = $pdo->query("select CONVERT_TZ('".$vehicle["edited"]."', '+00:00','+00:00') as edited;");
+            $edited = $stmt->fetch()["edited"];
 
 
-    //////////////////////////////////////////////////////////////////
+            // (name, model, manufacturer, cost_in_credits, `length`, max_atmosphering_speed, crew, passengers, 
+            //cargo_capacity, consumables, hyperdrive_rating, mglt, starship_class, pilots, films, created, edited, url, count)
+   
+            array_push($aux, "('".
+            implode("', '", 
+                [
+                    $vehicle["name"],
+                    $vehicle["model"],
+                    $vehicle["manufacturer"],
+                    $vehicle["cost_in_credits"],
+                    $vehicle["length"],
+                    $vehicle["max_atmosphering_speed"],
+                    $vehicle["crew"],
+                    $vehicle["passengers"],
+                    $vehicle["cargo_capacity"],
+                    $vehicle["consumables"],
+                    $vehicle["hyperdrive_rating"],
+                    $vehicle["MGLT"],
+                    $vehicle["starship_class"],
+                    implode(",", $vehicle["pilots"]),
+                    implode(",", $vehicle["films"]),
+                    $created,
+                    $edited,
+                    $vehicle["url"],
+                    0
+                ]
+            )."')");
 
+        }
 
+        //you must replace endpoint with next value with query string
+        $response = $client->request('GET', 'starships?'.parse_url($next, PHP_URL_QUERY));
+        
+        if ($response->getStatusCode() == 200){
+            $body = $response->getBody();
+            $body = (string)$body;
+        
+            $bodyArr = json_decode($body, true);
+        }
 
-    echo '[OK] SWAPI data imported successfully' . PHP_EOL;
+        echo "[OK] Page $page for starhips inserted" . PHP_EOL;
+        $page++;
+    }
+
+    $insertStment = $insertStment.implode(",",$aux);
+    $pdo->exec($insertStment);
 
 }
 
+
+
+echo '[OK] SWAPI data imported successfully' . PHP_EOL;
 
 } catch (PDOException $exception) {
     echo '[ERROR] ' . $exception->getMessage() . PHP_EOL;

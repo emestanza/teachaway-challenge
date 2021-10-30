@@ -41,6 +41,9 @@ $client = new Client([
 
 // Create a client with a base URI
 $client = new GuzzleHttp\Client(['base_uri' => 'https://swapi.dev/api/']);
+
+
+
 // Send a request to https://foo.com/api/test
 $response = $client->request('GET', 'vehicles');
 
@@ -55,12 +58,12 @@ if ($response->getStatusCode() == 200){
     VALUES ";
 
     $aux = [];
-
+    $page = 1;
     while (!$ended){
-        $next = $bodyArr["next"];
 
+        $next = $bodyArr["next"];
         if (is_null($next)){
-            $next = true;
+            $ended = true;
             continue;
         }
 
@@ -73,7 +76,7 @@ if ($response->getStatusCode() == 200){
             $stmt = $pdo->query("select CONVERT_TZ('".$vehicle["edited"]."', '+00:00','+00:00') as edited;");
             $edited = $stmt->fetch()["edited"];
 
-             array_push($aux, "('".
+            array_push($aux, "('".
             implode("', '", 
                 [
                     $vehicle["name"],
@@ -96,13 +99,11 @@ if ($response->getStatusCode() == 200){
                 ]
             )."')");
 
-           
         }
 
-
         //you must replace endpoint with next value with query string
-        $response = $client->request('GET', 'vehicles');
-
+        $response = $client->request('GET', 'vehicles?'.parse_url($next, PHP_URL_QUERY));
+        
         if ($response->getStatusCode() == 200){
             $body = $response->getBody();
             $body = (string)$body;
@@ -110,12 +111,18 @@ if ($response->getStatusCode() == 200){
             $bodyArr = json_decode($body, true);
         }
 
-
+        echo "[OK] Page $page for vehicles inserted" . PHP_EOL;
+        $page++;
        
     }
 
     $insertStment = $insertStment.implode(",",$aux);
     $pdo->exec($insertStment);
+
+
+    //////////////////////////////////////////////////////////////////
+
+
 
     echo '[OK] SWAPI data imported successfully' . PHP_EOL;
 

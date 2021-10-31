@@ -48,6 +48,41 @@ $app->get('/teachaway/{type}/{name}', function  (\Slim\Http\Request $request, \S
 });
 
 
+// # allow to set the total number of units for a specific vehicle or starship
+$app->put('/teachaway/{type}/{id}', function  (\Slim\Http\Request $request, \Slim\Http\Response $response, $args) {
+
+    try {
+      validatePutForSet(array_merge($args, $request->getParams()));
+
+      $sql = "UPDATE ".$args["type"]."
+      SET count=".$request->getParam('quantity')."
+      WHERE id=".$args["id"].";";
+
+      $db = new db();
+      $db = $db->connect($this->get('settings')["db"]);
+      $stmt = $db->exec( $sql );
+      $db = null; // clear db object
+      
+      return $response->withStatus(200);
+        
+    } 
+    catch( PDOException $e ) {
+      // show error message as Json format
+      return $response->withJson([
+        "error" => [
+            "msg" => $e->getMessage(),
+        ]], 400);
+    }
+    catch( ValidationException $e ) {
+        return $response->withJson([
+          "error" => [
+            $e->errorMessage(),
+          ]], 400);
+      }
+
+});
+
+
 // # let Slim starts to run
 // without run(), the api routes won't work
 $app->run();

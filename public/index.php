@@ -5,27 +5,25 @@ require __DIR__ .'/../src/app/app.php';
 require __DIR__ .'/../src/config/db.php';
 require __DIR__ .'/../src/app/validation.php';
 
+
 // # allow to get the total number of units for a specific vehicle or starship
 $app->get('/teachaway/{type}/{name}', function  (\Slim\Http\Request $request, \Slim\Http\Response $response, $args) {
 
-    $sql = "SELECT count
+    $sql = "SELECT id, name, count
     FROM ".$args["type"]."
-    WHERE UPPER(name) = UPPER('".$args["name"]."');";
+    WHERE UPPER(name) like CONCAT('%', '".$args["name"]."', '%');";
 
     try {
       validate($args);
       $db = new db();
       $db = $db->connect($this->get('settings')["db"]);
   
-      // query
       $stmt = $db->query( $sql );
-     
-      //$arts = $stmt->fetchAll( PDO::FETCH_OBJ );
-      $result = $stmt->fetch(PDO::FETCH_ASSOC);
+      $result = $stmt->fetchAll( PDO::FETCH_OBJ );
       $db = null; // clear db object
 
       if (!$result){
-          return $response->withStatus(400);
+          return $response->withStatus(404);
       }
       
       return $response->withJson($result, 200);
@@ -148,6 +146,14 @@ $app->put('/teachaway/{type}/decrease/{id}', function  (\Slim\Http\Request $requ
             $e->errorMessage(),
           ]], 400);
       }
+
+});
+
+// # Capturing bad routes
+$app->get('/[{path:.*}]', function  (\Slim\Http\Request $request, \Slim\Http\Response $response, $args) {
+ 
+    return $response->withJson(array("message" => "Bad Route: Check README.md")
+        , 400);
 
 });
 

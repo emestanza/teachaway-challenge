@@ -70,7 +70,7 @@ CREATE TABLE `vehicle` (
   `length` varchar(7) NOT NULL,
   `max_atmosphering_speed` varchar(10) NOT NULL,
   `crew` varchar(4) NOT NULL,
-  `passengers` varchar(4) NOT NULL,
+  `passengers` varchar(8) NOT NULL,
   `cargo_capacity` varchar(7) NOT NULL,
   `consumables` varchar(15) NOT NULL,
   `vehicle_class` varchar(50) NOT NULL,

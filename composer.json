@@ -6,8 +6,7 @@
         "guzzlehttp/guzzle": "^7.0"
     },
     "scripts": {
-        
-        "restart-db": "php extras/bin/restart-db.php"
-        
+        "restart-db": "php extras/bin/restart-db.php",
+        "start": "php -S localhost:8080 -t public public/index.php"
     }
 }

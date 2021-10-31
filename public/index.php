@@ -83,6 +83,75 @@ $app->put('/teachaway/{type}/{id}', function  (\Slim\Http\Request $request, \Sli
 });
 
 
+$app->put('/teachaway/{type}/increase/{id}', function  (\Slim\Http\Request $request, \Slim\Http\Response $response, $args) {
+
+    try {
+      validatePutForIncrease(array_merge($args, $request->getParams()));
+
+      $sql = "UPDATE ".$args["type"]."
+      SET count=count + ".$request->getParam('quantity')."
+      WHERE id=".$args["id"].";";
+
+      $db = new db();
+      $db = $db->connect($this->get('settings')["db"]);
+      $stmt = $db->exec( $sql );
+      $db = null; // clear db object
+      
+      return $response->withStatus(200);
+        
+    } 
+    catch( PDOException $e ) {
+      // show error message as Json format
+      return $response->withJson([
+        "error" => [
+            "msg" => $e->getMessage(),
+        ]], 400);
+    }
+    catch( ValidationException $e ) {
+        return $response->withJson([
+          "error" => [
+            $e->errorMessage(),
+          ]], 400);
+      }
+
+});
+
+
+
+$app->put('/teachaway/{type}/decrease/{id}', function  (\Slim\Http\Request $request, \Slim\Http\Response $response, $args) {
+
+    try {
+      validatePutForIncrease(array_merge($args, $request->getParams()));
+
+      $sql = "UPDATE ".$args["type"]."
+      SET count=count - ".$request->getParam('quantity')."
+      WHERE id=".$args["id"].";";
+
+      $db = new db();
+      $db = $db->connect($this->get('settings')["db"]);
+      $stmt = $db->exec( $sql );
+      $db = null; // clear db object
+      
+      return $response->withStatus(200);
+        
+    } 
+    catch( PDOException $e ) {
+      // show error message as Json format
+      return $response->withJson([
+        "error" => [
+            "msg" => $e->getMessage(),
+        ]], 400);
+    }
+    catch( ValidationException $e ) {
+        return $response->withJson([
+          "error" => [
+            $e->errorMessage(),
+          ]], 400);
+      }
+
+});
+
+
 // # let Slim starts to run
 // without run(), the api routes won't work
 $app->run();

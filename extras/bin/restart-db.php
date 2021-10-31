@@ -29,106 +29,126 @@ try {
     $pdo->exec($sql);
     echo '[OK] tables inserted successfully' . PHP_EOL;
 
-
-////////////IMporting swapi data
-
-$client = new Client([
-    // Base URI is used with relative requests
-    'base_uri' => 'http://httpbin.org',
-    // You can set any number of default request options.
-    'timeout'  => 2.0,
-]);
-
-// Create a client with a base URI
-$client = new GuzzleHttp\Client(['base_uri' => 'https://swapi.dev/api/']);
-
-
-
-// Send a request to https://foo.com/api/test
-$response = $client->request('GET', 'vehicles');
-
-if ($response->getStatusCode() == 200){
-    $body = $response->getBody();
-    $body = (string)$body;
-    $bodyArr = json_decode($body, true);
-    $ended = false;
-
-    $insertStment = "INSERT INTO teachaway2.vehicle
-    (name, model, manufacturer, cost_in_credits, `length`, max_atmosphering_speed, crew, passengers, cargo_capacity, consumables, vehicle_class, pilots, films, created, edited, url, count)
-    VALUES ";
-
-    $aux = [];
-    $page = 1;
-    while (!$ended){
-
-        $next = $bodyArr["next"];
-        if (is_null($next)){
-            $ended = true;
-            continue;
-        }
-
-        foreach($bodyArr["results"] as $vehicle){
-
-            // getting the last registered user
-            $stmt = $pdo->query("select CONVERT_TZ('".$vehicle["created"]."', '+00:00','+00:00') as created;");
-            $created = $stmt->fetch()["created"];
-
-            $stmt = $pdo->query("select CONVERT_TZ('".$vehicle["edited"]."', '+00:00','+00:00') as edited;");
-            $edited = $stmt->fetch()["edited"];
-
-            array_push($aux, "('".
-            implode("', '", 
-                [
-                    $vehicle["name"],
-                    $vehicle["model"],
-                    $vehicle["manufacturer"],
-                    $vehicle["cost_in_credits"],
-                    $vehicle["length"],
-                    $vehicle["max_atmosphering_speed"],
-                    $vehicle["crew"],
-                    $vehicle["passengers"],
-                    $vehicle["cargo_capacity"],
-                    $vehicle["consumables"],
-                    $vehicle["vehicle_class"],
-                    implode(",", $vehicle["pilots"]),
-                    implode(",", $vehicle["films"]),
-                    $created,
-                    $edited,
-                    $vehicle["url"],
-                    0
-                ]
-            )."')");
-
-        }
-
-        //you must replace endpoint with next value with query string
-        $response = $client->request('GET', 'vehicles?'.parse_url($next, PHP_URL_QUERY));
-        
-        if ($response->getStatusCode() == 200){
-            $body = $response->getBody();
-            $body = (string)$body;
-        
-            $bodyArr = json_decode($body, true);
-        }
-
-        echo "[OK] Page $page for vehicles inserted" . PHP_EOL;
-        $page++;
-       
-    }
-
-    $insertStment = $insertStment.implode(",",$aux);
-    $pdo->exec($insertStment);
-
-
-    //////////////////////////////////////////////////////////////////
-
-
+    $pdo->exec(importData('vehicle', $pdo));
+    $pdo->exec(importData('starship', $pdo));
 
     echo '[OK] SWAPI data imported successfully' . PHP_EOL;
 
+} catch (PDOException $exception) {
+    echo '[ERROR] ' . $exception->getMessage() . PHP_EOL;
 }
 
 
-} catch (PDOException $exception) {
-    echo '[ERROR] ' . $exception->getMessage() . PHP_EOL;
+function importData($model, $pdo){
+
+    // Create a client with a base URI
+    $client = new GuzzleHttp\Client(['base_uri' => SWAPI_BASE_URL]);
+    $modelArr = MODELS[$model];
+    $response = $client->request('GET', $modelArr['endpoint']);
+
+    if ($response->getStatusCode() == 200){
+        $body = $response->getBody();
+        $body = (string)$body;
+        $bodyArr = json_decode($body, true);
+        $ended = false;
+
+        $insertStment = $modelArr['insertStatement'];
+
+        $aux = [];
+        $page = 1;
+        while (!$ended){
+
+            foreach($bodyArr["results"] as $vehicle){
+
+                $stmt = $pdo->query("select CONVERT_TZ('".$vehicle["created"]."', '+00:00','+00:00') as created;");
+                $created = $stmt->fetch()["created"];
+
+                $stmt = $pdo->query("select CONVERT_TZ('".$vehicle["edited"]."', '+00:00','+00:00') as edited;");
+                $edited = $stmt->fetch()["edited"];
+
+                switch($model){
+
+                    case "vehicle":
+
+                        array_push($aux, "('".
+                        implode("', '", 
+                            [
+                                $vehicle["name"],
+                                $vehicle["model"],
+                                $vehicle["manufacturer"],
+                                $vehicle["cost_in_credits"],
+                                $vehicle["length"],
+                                $vehicle["max_atmosphering_speed"],
+                                $vehicle["crew"],
+                                $vehicle["passengers"],
+                                $vehicle["cargo_capacity"],
+                                $vehicle["consumables"],
+                                $vehicle["vehicle_class"],
+                                implode(",", $vehicle["pilots"]),
+                                implode(",", $vehicle["films"]),
+                                $created,
+                                $edited,
+                                $vehicle["url"],
+                                0
+                            ]
+                        )."')");
+
+                    break;
+
+                    case "starship":
+
+                        array_push($aux, "('".
+                        implode("', '", 
+                            [
+                                $vehicle["name"],
+                                $vehicle["model"],
+                                $vehicle["manufacturer"],
+                                $vehicle["cost_in_credits"],
+                                $vehicle["length"],
+                                $vehicle["max_atmosphering_speed"],
+                                $vehicle["crew"],
+                                $vehicle["passengers"],
+                                $vehicle["cargo_capacity"],
+                                $vehicle["consumables"],
+                                $vehicle["hyperdrive_rating"],
+                                $vehicle["MGLT"],
+                                $vehicle["starship_class"],
+                                implode(",", $vehicle["pilots"]),
+                                implode(",", $vehicle["films"]),
+                                $created,
+                                $edited,
+                                $vehicle["url"],
+                                0
+                            ]
+                        )."')");
+
+                    break;
+
+                }
+
+            }
+
+            echo "[OK] Page $page for $model inserted" . PHP_EOL;
+            $page++;
+
+            $next = $bodyArr["next"];
+            if (is_null($next)){
+                $ended = true;
+                continue;
+            }
+
+            $response = $client->request('GET', $modelArr["endpoint"]."?".parse_url($next, PHP_URL_QUERY));
+            
+            if ($response->getStatusCode() == 200){
+                $body = $response->getBody();
+                $body = (string)$body;
+            
+                $bodyArr = json_decode($body, true);
+            }    
+        
+        }
+
+        $insertStment = $insertStment.implode(",",$aux);
+        return $insertStment;
+    }
 }

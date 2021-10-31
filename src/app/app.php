@@ -3,6 +3,23 @@
 declare(strict_types=1);
 
 require __DIR__ . '/../../vendor/autoload.php';
+define("MODELS", [
+    "vehicle" => [
+        "endpoint" => "vehicles",
+        "insertStatement" => "INSERT INTO teachaway2.vehicle
+        (name, model, manufacturer, cost_in_credits, `length`, max_atmosphering_speed, crew, passengers, cargo_capacity, consumables, vehicle_class, pilots, films, created, edited, url, count)
+        VALUES "
+    ],
+    "starship" => [
+        "endpoint" => "starships",
+        "insertStatement" => "INSERT INTO teachaway2.starship
+        (name, model, manufacturer, cost_in_credits, `length`, max_atmosphering_speed, crew, passengers, cargo_capacity, consumables, hyperdrive_rating, mglt, starship_class, pilots, films, created, edited, url, count)
+        VALUES "
+    ]
+]);
+
+define("SWAPI_BASE_URL", 'https://swapi.dev/api/');
+
 $baseDir = __DIR__ . '/../../';
 $dotenv = Dotenv\Dotenv::createImmutable($baseDir);
 $envFile = $baseDir . '.env';

@@ -6,13 +6,13 @@ require __DIR__ . '/../../vendor/autoload.php';
 define("MODELS", [
     "vehicle" => [
         "endpoint" => "vehicles",
-        "insertStatement" => "INSERT INTO teachaway2.vehicle
+        "insertStatement" => "INSERT INTO vehicle
         (name, model, manufacturer, cost_in_credits, `length`, max_atmosphering_speed, crew, passengers, cargo_capacity, consumables, vehicle_class, pilots, films, created, edited, url, count)
         VALUES "
     ],
     "starship" => [
         "endpoint" => "starships",
-        "insertStatement" => "INSERT INTO teachaway2.starship
+        "insertStatement" => "INSERT INTO starship
         (name, model, manufacturer, cost_in_credits, `length`, max_atmosphering_speed, crew, passengers, cargo_capacity, consumables, hyperdrive_rating, mglt, starship_class, pilots, films, created, edited, url, count)
         VALUES "
     ]

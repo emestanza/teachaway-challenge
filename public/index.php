@@ -3,6 +3,7 @@
 require __DIR__ . '/../vendor/autoload.php';
 require __DIR__ .'/../src/app/app.php';
 require __DIR__ .'/../src/config/db.php';
+require __DIR__ .'/../src/app/validation.php';
 
 // # allow to get the total number of units for a specific vehicle or starship
 $app->get('/teachaway/{type}/{name}', function  (\Slim\Http\Request $request, \Slim\Http\Response $response, $args) {
@@ -12,7 +13,7 @@ $app->get('/teachaway/{type}/{name}', function  (\Slim\Http\Request $request, \S
     WHERE UPPER(name) = UPPER('".$args["name"]."');";
 
     try {
-
+      validate($args);
       $db = new db();
       $db = $db->connect($this->get('settings')["db"]);
   
@@ -24,7 +25,7 @@ $app->get('/teachaway/{type}/{name}', function  (\Slim\Http\Request $request, \S
       $db = null; // clear db object
 
       if (!$result){
-          return $response->withStatus(404);
+          return $response->withStatus(400);
       }
       
       return $response->withJson($result, 200);
@@ -35,8 +36,14 @@ $app->get('/teachaway/{type}/{name}', function  (\Slim\Http\Request $request, \S
       return $response->withJson([
         "error" => [
             "msg" => $e->getMessage(),
-        ]], 404);
+        ]], 400);
     }
+    catch( ValidationException $e ) {
+        return $response->withJson([
+          "error" => [
+            $e->errorMessage(),
+          ]], 400);
+      }
 
 });
 

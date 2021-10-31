@@ -45,13 +45,20 @@ $app->put('/teachaway/{type}/{id}', function  (\Slim\Http\Request $request, \Sli
 
     try {
       validatePutForSet(array_merge($args, $request->getParams()));
+      $db = new db();
+      $db = $db->connect($this->get('settings')["db"]);
+
+      $stmt = $db->query( "select id from ".$args["type"]." where id = ".$args["id"].";");
+      $result = $stmt->fetch( PDO::FETCH_OBJ );
+      
+      if (!$result){
+          return $response->withStatus(404);
+      }
 
       $sql = "UPDATE ".$args["type"]."
       SET count=".$request->getParam('quantity')."
       WHERE id=".$args["id"].";";
 
-      $db = new db();
-      $db = $db->connect($this->get('settings')["db"]);
       $stmt = $db->exec( $sql );
       $db = null; // clear db object
       
@@ -79,12 +86,20 @@ $app->put('/teachaway/{type}/increase/{id}', function  (\Slim\Http\Request $requ
     try {
       validatePutForIncrease(array_merge($args, $request->getParams()));
 
+      $db = new db();
+      $db = $db->connect($this->get('settings')["db"]);
+
+      $stmt = $db->query( "select id from ".$args["type"]." where id = ".$args["id"].";");
+      $result = $stmt->fetch( PDO::FETCH_OBJ );
+      
+      if (!$result){
+          return $response->withStatus(404);
+      }
+
       $sql = "UPDATE ".$args["type"]."
       SET count=count + ".$request->getParam('quantity')."
       WHERE id=".$args["id"].";";
 
-      $db = new db();
-      $db = $db->connect($this->get('settings')["db"]);
       $stmt = $db->exec( $sql );
       $db = null; // clear db object
       
@@ -112,12 +127,20 @@ $app->put('/teachaway/{type}/decrease/{id}', function  (\Slim\Http\Request $requ
     try {
       validatePutForIncrease(array_merge($args, $request->getParams()));
 
+      $db = new db();
+      $db = $db->connect($this->get('settings')["db"]);
+
+      $stmt = $db->query( "select id from ".$args["type"]." where id = ".$args["id"].";");
+      $result = $stmt->fetch( PDO::FETCH_OBJ );
+      
+      if (!$result){
+          return $response->withStatus(404);
+      }
+
       $sql = "UPDATE ".$args["type"]."
       SET count=count - ".$request->getParam('quantity')."
       WHERE id=".$args["id"].";";
 
-      $db = new db();
-      $db = $db->connect($this->get('settings')["db"]);
       $stmt = $db->exec( $sql );
       $db = null; // clear db object
       

@@ -1,5 +1,7 @@
 <?php
-
+require __DIR__ .'/../middleware/ValidationGetInfoMiddleware.php';
+require __DIR__ .'/../middleware/ValidationPutQuantityMiddleware.php';
+require __DIR__ .'/../middleware/ValidationPutIncDecMiddleware.php';
 
 // # allow to get the total number of units for a specific vehicle or starship
 $app->get('/teachaway/{type}/{name}', function  (\Slim\Http\Request $request, \Slim\Http\Response $response, $args) {
@@ -9,7 +11,6 @@ $app->get('/teachaway/{type}/{name}', function  (\Slim\Http\Request $request, \S
     WHERE UPPER(name) like CONCAT('%', '".$args["name"]."', '%');";
 
     try {
-      validate($args);
       $db = new db();
       $db = $db->connect($this->get('settings')["db"]);
   
@@ -23,7 +24,7 @@ $app->get('/teachaway/{type}/{name}', function  (\Slim\Http\Request $request, \S
       
       return $response->withJson($result, 200);
         
-    } 
+    }
     catch( PDOException $e ) {
       // show error message as Json format
       return $response->withJson([
@@ -31,20 +32,14 @@ $app->get('/teachaway/{type}/{name}', function  (\Slim\Http\Request $request, \S
             "msg" => $e->getMessage(),
         ]], 400);
     }
-    catch( ValidationException $e ) {
-        return $response->withJson([
-          "error" => [
-            $e->errorMessage(),
-          ]], 400);
-      }
+    
 
-});
+})->add( new ValidationGetInfoMiddleware());
 
 // # allow to set the total number of units for a specific vehicle or starship
 $app->put('/teachaway/{type}/{id}', function  (\Slim\Http\Request $request, \Slim\Http\Response $response, $args) {
 
     try {
-      validatePutForSet(array_merge($args, $request->getParams()));
       $db = new db();
       $db = $db->connect($this->get('settings')["db"]);
 
@@ -72,20 +67,12 @@ $app->put('/teachaway/{type}/{id}', function  (\Slim\Http\Request $request, \Sli
             "msg" => $e->getMessage(),
         ]], 400);
     }
-    catch( ValidationException $e ) {
-        return $response->withJson([
-          "error" => [
-            $e->errorMessage(),
-          ]], 400);
-      }
 
-});
+})->add( new ValidationPutQuantityMiddleware());
 
 $app->put('/teachaway/{type}/increase/{id}', function  (\Slim\Http\Request $request, \Slim\Http\Response $response, $args) {
 
     try {
-      validatePutForIncrease(array_merge($args, $request->getParams()));
-
       $db = new db();
       $db = $db->connect($this->get('settings')["db"]);
 
@@ -113,19 +100,12 @@ $app->put('/teachaway/{type}/increase/{id}', function  (\Slim\Http\Request $requ
             "msg" => $e->getMessage(),
         ]], 400);
     }
-    catch( ValidationException $e ) {
-        return $response->withJson([
-          "error" => [
-            $e->errorMessage(),
-          ]], 400);
-      }
 
-});
+})->add( new ValidationPutIncDecMiddleware());
 
 $app->put('/teachaway/{type}/decrease/{id}', function  (\Slim\Http\Request $request, \Slim\Http\Response $response, $args) {
 
     try {
-      validatePutForIncrease(array_merge($args, $request->getParams()));
 
       $db = new db();
       $db = $db->connect($this->get('settings')["db"]);
@@ -154,14 +134,8 @@ $app->put('/teachaway/{type}/decrease/{id}', function  (\Slim\Http\Request $requ
             "msg" => $e->getMessage(),
         ]], 400);
     }
-    catch( ValidationException $e ) {
-        return $response->withJson([
-          "error" => [
-            $e->errorMessage(),
-          ]], 400);
-      }
 
-});
+})->add( new ValidationPutIncDecMiddleware());
 
 // # Capturing bad routes
 $app->get('/[{path:.*}]', function  (\Slim\Http\Request $request, \Slim\Http\Response $response, $args) {

@@ -70,6 +70,7 @@ $app->put('/teachaway/{type}/{id}', function  (\Slim\Http\Request $request, \Sli
 
 })->add( new ValidationPutQuantityMiddleware());
 
+// # allow to increment the the total number of units for a specific starship or vehicle
 $app->put('/teachaway/{type}/increase/{id}', function  (\Slim\Http\Request $request, \Slim\Http\Response $response, $args) {
 
     try {
@@ -103,6 +104,7 @@ $app->put('/teachaway/{type}/increase/{id}', function  (\Slim\Http\Request $requ
 
 })->add( new ValidationPutIncDecMiddleware());
 
+// # allow to decrement the the total number of units for a specific starship or vehicle
 $app->put('/teachaway/{type}/decrease/{id}', function  (\Slim\Http\Request $request, \Slim\Http\Response $response, $args) {
 
     try {

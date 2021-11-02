@@ -87,7 +87,7 @@ All the information of the API, prepared to download and use as postman collecti
 
 ## :heart: DO YOU LIKE THE PROJECT?
 
-Hire me ;) hehe.
+Hire me, you won't regret it ;) hehe.
 
 
 ## :page_facing_up: LICENSE

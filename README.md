@@ -15,8 +15,8 @@ Main technologies used: `PHP 7, Slim 3, Guzzle, MySQL and dotenv.`
 - Composer.
 - PHP 7.4+ or 8.0+.
 - MySQL.
-- PHP extensions php-mysql and php-xml
-` sudo apt-get install php-mysql php-xml`
+- PHP extensions php-mysql, php-xml and php-mbstring
+` sudo apt-get install php-mysql php-xml php-mbstring`
 
 
 ### Using Git:
@@ -28,6 +28,7 @@ $ git clone https://github.com/emestanza/teachaway-challenge.git && cd teachaway
 $ cp .env.example .env
 $ composer install
 $ composer restart-db
+$ composer test
 $ composer start
 ```
 

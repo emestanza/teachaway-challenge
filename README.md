@@ -15,8 +15,8 @@ Main technologies used: `PHP 7, Slim 3, Guzzle, MySQL and dotenv.`
 - Composer.
 - PHP 7.4+ or 8.0+.
 - MySQL.
-- PHP extensions php-mysql and php-xml
-` sudo apt-get install php-mysql php-xml`
+- PHP extensions php-mysql, php-xml and php-mbstring
+` sudo apt-get install php-mysql php-xml php-mbstring`
 
 
 ### Using Git:
@@ -28,6 +28,7 @@ $ git clone https://github.com/emestanza/teachaway-challenge.git && cd teachaway
 $ cp .env.example .env
 $ composer install
 $ composer restart-db
+$ composer test
 $ composer start
 ```
 
@@ -42,6 +43,10 @@ $ composer start
 - [guzzlehttp/guzzle](https://github.com/guzzle/guzzle): PHP HTTP client that makes it easy to send HTTP requests and trivial to integrate with web services.
 - [vlucas/valitron](https://github.com/vlucas/valitron): Valitron is a simple, minimal and elegant stand-alone validation library with NO dependencies.
 
+
+### LIST OF DEVELOPMENT DEPENDENCIES:
+
+- [phpunit/phpunit](https://github.com/sebastianbergmann/phpunit): The PHP Unit Testing framework.
 
 ## :books: DOCUMENTATION:
 
@@ -67,11 +72,11 @@ $ composer start
 
 - Search by name: `GET /teachaway/starship/{name}`
 
-- Set initial quantity to vehicles: `PUT /teachaway/starship/{id}`
+- Set initial quantity to starships: `PUT /teachaway/starship/{id}`
 
-- Increase vehicles quantity: `PUT '/teachaway/starship/increase/{id}`
+- Increase starships quantity: `PUT '/teachaway/starship/increase/{id}`
 
-- Decrease vehicles quantity: `PUT /teachaway/starship/decrease/{id}`
+- Decrease starships quantity: `PUT /teachaway/starship/decrease/{id}`
 
 
 ### HELP AND DOCS:

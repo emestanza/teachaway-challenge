@@ -72,11 +72,11 @@ $ composer start
 
 - Search by name: `GET /teachaway/starship/{name}`
 
-- Set initial quantity to vehicles: `PUT /teachaway/starship/{id}`
+- Set initial quantity to starships: `PUT /teachaway/starship/{id}`
 
-- Increase vehicles quantity: `PUT '/teachaway/starship/increase/{id}`
+- Increase starships quantity: `PUT '/teachaway/starship/increase/{id}`
 
-- Decrease vehicles quantity: `PUT /teachaway/starship/decrease/{id}`
+- Decrease starships quantity: `PUT /teachaway/starship/decrease/{id}`
 
 
 ### HELP AND DOCS:

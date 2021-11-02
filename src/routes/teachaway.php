@@ -3,6 +3,38 @@ require __DIR__ .'/../middleware/ValidationGetInfoMiddleware.php';
 require __DIR__ .'/../middleware/ValidationPutQuantityMiddleware.php';
 require __DIR__ .'/../middleware/ValidationPutIncDecMiddleware.php';
 
+// # endpoint list
+$app->get('/', function  (\Slim\Http\Request $request, \Slim\Http\Response $response, $args) {
+
+  $appData = $this->get('settings')['app'];
+  $url = $appData['domain'];
+  $endpoints = [
+      'Vehicles' => [
+        "GET Search by criteria" => $url . '/teachaway/vehicle/<name>',
+        "PUT Setting initial quantity to vehicles" => $url . '/teachaway/vehicle/<id>',
+        "PUT Increase vehicles quantity" => $url . '/teachaway/vehicle/increase/<id>',
+        "PUT Decrease vehicles quantity" => $url . '/teachaway/vehicle/decrease/<id>',
+      ],
+      'Starships' => [
+        "GET Search by criteria" => $url . '/teachaway/starship/<name>',
+        "PUT Setting initial quantity to starships" => $url . '/teachaway/starship/<id>',
+        "PUT Increase starships quantity" => $url . '/teachaway/starship/increase/<id>',
+        "PUT Decrease starships quantity" => $url . '/teachaway/starship/decrease/<id>',
+      ],
+      
+      'this help' => $url . '',
+  ];
+  $message = [
+      'endpoints' => $endpoints,
+      'version' => "1.0",
+      'timestamp' => time(),
+  ];
+
+  return $response->withJson($message, 200);
+  
+
+});
+
 // # allow to get the total number of units for a specific vehicle or starship
 $app->get('/teachaway/{type}/{name}', function  (\Slim\Http\Request $request, \Slim\Http\Response $response, $args) {
 
@@ -136,11 +168,3 @@ $app->put('/teachaway/{type}/decrease/{id}', function  (\Slim\Http\Request $requ
     }
 
 })->add( new ValidationPutIncDecMiddleware());
-
-// # Capturing bad routes
-$app->get('/[{path:.*}]', function  (\Slim\Http\Request $request, \Slim\Http\Response $response, $args) {
- 
-    return $response->withJson(array("message" => "Bad Route: Check README.md")
-        , 400);
-
-});

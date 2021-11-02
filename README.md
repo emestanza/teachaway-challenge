@@ -44,6 +44,10 @@ $ composer start
 - [vlucas/valitron](https://github.com/vlucas/valitron): Valitron is a simple, minimal and elegant stand-alone validation library with NO dependencies.
 
 
+### LIST OF DEVELOPMENT DEPENDENCIES:
+
+- [phpunit/phpunit](https://github.com/sebastianbergmann/phpunit): The PHP Unit Testing framework.
+
 ## :books: DOCUMENTATION:
 
 ### ENDPOINTS:

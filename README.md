@@ -23,6 +23,8 @@ Main technologies used: `PHP 7, Slim 3, Guzzle, MySQL and dotenv.`
 
 In your terminal execute this commands:
 
+NOTE: .env file has environment variables, please take a look to adjust them according to your needs
+
 ```bash
 $ git clone https://github.com/emestanza/teachaway-challenge.git && cd teachaway-challenge
 $ cp .env.example .env
